@@ -41,6 +41,7 @@ const ProfileForm = () => {
     };
     changePassword().catch((error) => alert(error.message));
   };
+
   return (
     <form className={classes.form} onSubmit={submitHandler}>
       <div className={classes.control}>
