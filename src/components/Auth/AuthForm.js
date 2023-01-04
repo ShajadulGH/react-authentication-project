@@ -16,39 +16,43 @@ const AuthForm = () => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
+    let url;
+    if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDjqTuvP9UU9KIdm_58qGM0iISIAigCxsA";
+    } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDjqTuvP9UU9KIdm_58qGM0iISIAigCxsA";
+    }
     const sendUser = async () => {
       setIsLoading(true);
-      const response = await fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDjqTuvP9UU9KIdm_58qGM0iISIAigCxsA",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-            returnSecureToken: true,
-          }),
-        }
-      );
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          returnSecureToken: true,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
       if (response.ok) {
         setIsLoading(false);
-        alert("Succesfully Signed Up");
+        emailRef.current.value = "";
+        passwordRef.current.value = "";
       } else {
         let errorMessage = "Authentication Failed!";
-        const data = await response.json();
         if (data && data.error.errors[0].message) {
           errorMessage = data.error.errors[0].message;
-          alert(errorMessage);
           setIsLoading(false);
+          throw new Error(errorMessage);
         }
       }
     };
-    if (isLogin) {
-    } else {
-      sendUser();
-    }
+    sendUser().catch((error) => alert(error.message));
   };
   return (
     <section className={classes.auth}>
