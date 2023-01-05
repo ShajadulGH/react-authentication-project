@@ -13,7 +13,6 @@ const AuthForm = () => {
     setIsLogin((prevState) => !prevState);
   };
   const submitHandler = (e) => {
-    console.log("working");
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
@@ -39,11 +38,13 @@ const AuthForm = () => {
         }),
       });
       const data = await response.json();
-      console.log(data);
       if (response.ok) {
         setIsLoading(false);
         if (isLogin) {
-          authCtx.login(data.idToken);
+          const expireTime = new Date(
+            new Date().getTime() + +data.expiresIn * 1000
+          );
+          authCtx.login(data.idToken, expireTime.toISOString());
           history.replace("/");
         } else {
           setIsLogin(true);
